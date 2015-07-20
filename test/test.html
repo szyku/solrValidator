@@ -1,0 +1,300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Solr.Validator Test</title>
+
+    <script src="http://code.jquery.com/jquery-1.7.1.min.js" type="text/javascript"></script>
+    <script src="../min/solr.validator.messages-min.js" type="text/javascript"></script>
+    <script src="../min/solr.validator-min.js" type="text/javascript"></script>
+
+    <style type="text/css">
+        #invalidQueries li,#invalidQueriesNormal li,#invalidQueriesStrict li { background-color: #FFEA0A; margin-bottom: 2px;}
+        #invalidQueries li.active-item,#invalidQueriesNormal li.active-item,#invalidQueriesStrict li.active-item {background-color: #FFA126;}
+        #validQueries li { background-color: #96FF70; margin-bottom: 2px;}
+        #validQueries li.active-item {background-color: #FFA126;}
+
+        .error {background-color: #FF9BA0;}
+        .valid {background-color: #96FF70;}
+
+    </style>
+
+
+</head>
+<body style="margin:30px;">
+<h1>Solr.Validator Test</h1>
+<form>
+
+    <textarea cols ="100" rows="10" id="TestQuery"></textarea>
+    <div style="width: 723px;">
+        <div style="float:left;">
+            Mode: <input type="radio" name="usageMode" value="strict" /> strict / <input type="radio" name="usageMode" value="normal" checked="checked" /> normal
+            <br />
+            <input type="checkbox" id="useWhiteList" value="true" checked="checked" />Use Field WhiteList ("|title:|content:|")
+            <br />
+            Language? <select id="Language">
+                <option value="nl">nl</option>
+                <option value="en">en</option>
+            </select>
+        </div>
+        <div style="float:right;">
+            <input type="submit" id="SubmitTest" />
+        </div>
+    </div>
+
+
+</form>
+<div style="clear:both;"/>
+
+
+<div id="message" style="margin-top: 40px; padding-top: 10px; padding-bottom: 10px; border-top: 1px solid #000;"></div>
+
+<div style="border-top: 1px solid #000;"">
+
+<table>
+    <tr>
+        <td width="33%" valign="top">
+            <p><b>Invalid query examples</b> (<i>Click to load</i>)</p>
+            <ul id="invalidQueries">
+                <li>Wild wildcard *</li>
+                <li>(You ""should" close these things</li>
+                <li>You should" open) (these)) things</li>
+                <li>+this -is +okay - this is + not</li>
+                <li>This is invalid ~ ^ :</li>
+                <li>+</li>
+                <li>-</li>
+                <li>:</li>
+                <li>*</li>
+                <li>"Jakarta apache"~10 apache~5 jakarta~</li>
+                <li>(nanotechnologie OR  Gevelreiniging OR "Graffiti verwijderen" OR   OR Universol OR Tutoprom OR Hydrofobering)</li>
+                <li>: what : is this :</li>
+                <li>this OR that OR -nothing OR NOT whatever</li>
+                <li>(#houseparty OR (#party OR fissa OR feest OR Bolle) (OR Heukelum OR Asperen OR Acquoy OR Gellicum))</li>
+                <li>Rabobank -</li>
+                <li>((siers (AND leidingprojecten OR montageprojekten OR leidingprojekten OR telecom OR technisch OR adviesbureau OR Oldenzaal) OR tablin)</li>
+                <li>“not valid quotes”</li>
+                <li>‘not valid quotes‘</li>
+                <li>?not valid quotes?</li>
+                <li>?not valid quotes?</li>
+                <li>’not valid quotes’</li>
+                <li>?not valid quotes?</li>
+                <li>?not valid quotes”</li>
+                <li>jakarta^4 apache</li>
+                <li>"jakarta apache"^4</li>
+                <li>(("Novo Nordisk" OR "Changing Diabetes" OR "Stichting CGR" OR ) AND NOT (Wiel*OR renner OR deelnemer* OR kopgroep OR peloton OR km AND))</li>
+                <li>Titel:evaluatie OR title:evaluatie OR title: evaluatie OR what : "is this" AND (content:evaluatie OR content:"evaluerende optreden")</li>
+                <li>invalid character <</li>
+                <li>dit AND (dat OR eindigt OR op OR OR QUID)</li>
+            </ul>
+        </td>
+        <td width="33%" valign="top">
+            <p><b>Invalid query examples (strict mode)</b> (<i>Click to load</i>)</p>
+            <ul id="invalidQueriesStrict">
+                <li>wildcard*</li>
+                <li>this AND that</li>
+                <li>"jakarta apache"~10</li>
+                <li>(("Novo Nordisk" OR "Changing Diabetes" OR "Stichting CGR" OR ) AND NOT (Wiel*OR renner OR deelnemer* OR kopgroep OR peloton OR km AND))</li>
+                <li>title:evaluatie AND (content:evaluatie OR content:"evaluerende optreden")</li>
+                <li>jakarta^4 apache</li>
+                <li>"jakarta apache"^4</li>
+            </ul>
+        </td>
+       <td width="33%" valign="top">
+            <p><b>Valid query examples (normal mode)</b> (<i>Click to load</i>)</p>
+            <ul id="validQueries">
+                <li>this AND that</li>
+                <li>title:"This is only valid if title is part of the solr field whitelist"</li>
+                <li>title:"This is ~ only ! valid ? if % title ^ is + part - of # the @ solr field whitelist"</li>
+                <li>(this AND that) AND NOT whatever</li>
+                <li>(this OR that) AND NOT whatever</li>
+                <li>"BOR de wolf" OR "ANDY" OR BOR</li>
+                <li>BAND AND ZAND</li>
+                <li>this -that</li>
+                <li>this +that +other</li>
+                <li>"Jakarta apache"~10</li>
+                <li>title:"De Gelderlander - Nijmegen (blendle)"</li>
+                <li>"Hannie's- Quilts en Art-Textiel Welkom op mijn blog"</li>
+                <li>"Europese Unie - Tenders Electronic Daily"</li>
+                <li>title:this +title:that +content:other</li>
+                <li>dit AND (dat OR eindigt OR op OR ORQUID)</li>
+                <li>Test OR ORQUID</li>
+                <li>ACCEPTANCE TESTING Testing to verify a product meets customer specified requirements. A customer usually does this type of testing on a product that is developed externally. BLACK BOX TESTING Testing without knowledge of the internal workings of the item being tested. Tests are usually functional. COMPATIBILITY TESTING Testing to ensure compatibility of an application or Web site with different browsers OSs and hardware platforms Compatibility testing can be performed manually or can be driven by an automated functional or regression test suite. CONFORMANCE TESTING Verifying implementation conformance to industry standards. Producing tests for the behavior of an implementation to be sure it provides the portability interoperability and or compatibility a standard defines. FUNCTIONAL TESTING Validating an application or Web site conforms to its specifications and correctly performs all its required functions. This entails a series of tests which perform a feature by feature validation of behavior using a wide range of normal and erroneous input data This can involve testing of the products user interface APIs database management security installation networking etcF testing can be performed on an automated or manual basis using black box or white box methodologies. INTEGRATION TESTING Testing in which modules are combined and tested as a group. Modules are typically code modules individual applications client and server applications on a network etc Integration Testing follows unit testing and precedes system testing. LOAD TESTING Load testing is a generic term covering Performance Testing and Stress Testing. PERFORMANCE TESTING</li>
+            </ul>
+        </td>
+    </tr>
+</table>
+
+
+
+
+
+
+</div>
+
+<script type="text/javascript">
+    $("#SubmitTest").click(function () {
+        var query = $('#TestQuery').val();
+        var lang = $("#Language").val();
+        var mode = $("input:radio[name=usageMode]:checked").val();
+        var useLogging = true;
+        var useWhiteList = $("#useWhiteList").is(':checked');
+        if (mode == "strict") {
+            useWhiteList = false;
+        }
+        TestTest123(query, lang, mode, useWhiteList, useLogging);
+        return false;
+    });
+
+    $("input:radio[name=usageMode]").click(function () {
+        var mode = $("input:radio[name=usageMode]:checked").val();
+        if (mode == "strict") {
+            $("#useWhiteList").attr("disabled", true);
+        }
+        if (mode == "normal") {
+            $("#useWhiteList").removeAttr("disabled");
+        }
+    });
+
+    $("#invalidQueries > li").click(function () {
+        $('#TestQuery').val($(this).html());
+        ResetActiveItem();
+        $(this).addClass('active-item')
+        return false;
+    });
+
+    $("#invalidQueriesStrict > li").click(function () {
+        $('#TestQuery').val($(this).html());
+        ResetActiveItem();
+        $(this).addClass('active-item')
+        return false;
+    });
+
+    $("#invalidQueriesNormal > li").click(function () {
+        $('#TestQuery').val($(this).html());
+        ResetActiveItem();
+        $(this).addClass('active-item')
+        return false;
+    });
+
+    $("#validQueries > li").click(function () {
+        $('#TestQuery').val($(this).html());
+        ResetActiveItem();
+         $(this).addClass('active-item')
+        return false;
+    });
+
+    function ResetActiveItem() {
+        $('#validQueries').find('li').removeClass('active-item');
+        $('#invalidQueriesNormal').find('li').removeClass('active-item');
+        $('#invalidQueriesStrict').find('li').removeClass('active-item');
+        $('#invalidQueries').find('li').removeClass('active-item');
+    }
+
+
+    function TestTest123(query, lang, mode, useWhiteList, useLogging) {
+        $('#message').html('');
+        var sV;
+        if (useWhiteList) {
+            sV = new solrValidator(lang, mode, "|title:|content:|source:|", 2000, useLogging);
+        } else {
+            sV = new solrValidator(lang, mode, "", 2000, useLogging);
+        }
+
+        sV.validate(query);
+        if (sV.errorMessages.length == 0) {
+            $('#message').html("Query is valid");
+            $('#message').removeClass('error')
+            $('#message').addClass('valid')
+        } else {
+            var errorHtml = ''
+            for (var i = 0; i < sV.errorMessages.length; i++) {
+                errorHtml = errorHtml + ' - ' + sV.errorMessages[i] + '<br/>';
+            }
+            $('#message').html(errorHtml);
+            $('#message').removeClass('valid')
+            $('#message').addClass('error')
+
+        }
+    }
+
+
+</script>
+
+
+
+
+
+<hr />
+
+
+<p><b>Include</b></p>
+<pre>
+     &lt;script src=&quot;solr.validator.messages.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+     &lt;script src=&quot;solr.validator.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+</pre>
+
+<p><b>Usage Example</b> (TODO update examples)</p>
+<pre>
+    //----------------------------------------------------------------------------
+    //-- Example 1
+    //----------------------------------------------------------------------------
+    var sV = new solrValidator("nl"); // specify the language for the messages. Options: en (english) and nl (dutch)
+    sV.validate(YOUR_QUERY);
+
+    if (sV.errorMessages.length == 0) {
+        // Query is valid
+        // pass search on to SOLR
+    } else {
+        // Do not start search, show error messages
+        for (var i = 0; i < sV.errorMessages.length; i++) {
+            console.log(sV.errorMessages[i]); // add code to show messages
+        }
+    }
+    //----------------------------------------------------------------------------
+    //-- Example 2
+    //----------------------------------------------------------------------------
+    //-- with a solr field whitelist.
+    //-- Note the different behavior with the example:
+    //--
+    //--    Titel:evaluatie OR title:evaluatie OR title: evaluatie OR what : "is this"
+    //--    AND (content:evaluatie OR content:"evaluerende optreden")
+    //--
+    //----------------------------------------------------------------------------
+    var sV = new solrValidator("nl","|title:|content:|"); // specify the language for the messages. Options: en (english) and nl (dutch)
+    sV.validate(YOUR_QUERY);
+
+    if (sV.errorMessages.length == 0) {
+        // Query is valid
+        // pass search on to SOLR
+    } else {
+        // Do not start search, show error messages
+        for (var i = 0; i < sV.errorMessages.length; i++) {
+            console.log(sV.errorMessages[i]); // add code to show messages
+        }
+    }
+    //--------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-- All options
+    //--------------------------------------------------------------------------------------------------------------------------------------------------------
+    // language:            nl (dutch) or en (english)              (default: nl)
+    // mode:                strict or normal                        (default: normal)
+    // allowedSolrFields:   for example "|title:|content:|"         (default: null)
+    // maxLength:           max length for query, for example 1000  (default: 4000)
+    // UseConsoleLog:       set to true to get detailed logs in the console of how a query is processed. (default: false)
+    //--------------------------------------------------------------------------------------------------------------------------------------------------------
+    var sV = new solrValidator("nl", "normal","|title:|content:|", 1000, true); // specify the language for the messages. Options: en (english) and nl (dutch)
+    sV.validate(YOUR_QUERY);
+    if (sV.errorMessages.length == 0) {
+        // Query is valid
+        // pass search on to SOLR
+    } else {
+        // Do not start search, show error messages
+        for (var i = 0; i < sV.errorMessages.length; i++) {
+            console.log(sV.errorMessages[i]); // add code to show messages
+        }
+    }
+
+
+</pre>
+
+</body>
+</html>
