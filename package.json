@@ -1,0 +1,27 @@
+{
+  "name": "solr_validator",
+  "version": "1.0.0",
+  "description": "Is a javascript validator for solr queries.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/szyku/solrValidator.git"
+  },
+  "keywords": [
+    "solr",
+    "validator",
+    "query"
+  ],
+  "author": "HowardsHome",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/szyku/solrValidator/issues"
+  },
+  "homepage": "https://github.com/szyku/solrValidator#readme"
+}
